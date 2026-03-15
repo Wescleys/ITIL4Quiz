@@ -13,6 +13,7 @@ const StatCard = ({ label, value }) => (
 export default function DashboardArea() {
   const [daysLeft, setDaysLeft] = useState('...');
   const [historyData, setHistoryData] = useState([]);
+  const [totalStudyTime, setTotalStudyTime] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchDashboardData = async () => {
@@ -46,10 +47,17 @@ export default function DashboardArea() {
           date: new Date(item.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
         }));
         setHistoryData(formatted);
+
+        // Calcular tempo total de estudo
+        const totalSeconds = data.reduce((acc, curr) => acc + (curr.duration || 0), 0);
+        setTotalStudyTime(totalSeconds);
       } else {
         // Fallback Local
         const savedLocal = JSON.parse(localStorage.getItem('itil_quiz_history')) || [];
         setHistoryData(savedLocal);
+        
+        const totalSecondsLocal = savedLocal.reduce((acc, curr) => acc + (curr.duration || 0), 0);
+        setTotalStudyTime(totalSecondsLocal);
       }
     }
     setLoading(false);
@@ -63,6 +71,15 @@ export default function DashboardArea() {
   const mediaAcertos = totalSimulados > 0 
     ? Math.round(historyData.reduce((acc, curr) => acc + curr.score, 0) / totalSimulados) 
     : 0;
+
+  const formatStudyTime = (seconds) => {
+    if (seconds <= 0) return "0m";
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m}m`;
+  };
 
   const chartData = historyData.map((item, index) => ({
     name: `S${index + 1}`,
@@ -82,7 +99,7 @@ export default function DashboardArea() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Simulados Feitos" value={totalSimulados} />
         <StatCard label="Média de Acertos" value={totalSimulados > 0 ? `${Math.round((mediaAcertos / 100) * 40)}/40` : "0/40"} />
-        <StatCard label="Tempo de Estudo" value={totalSimulados > 0 ? "Ativo" : "Pendente"} />
+        <StatCard label="Tempo de Estudo" value={formatStudyTime(totalStudyTime)} />
         <StatCard label="Dias p/ Prova" value={daysLeft} />
       </div>
 

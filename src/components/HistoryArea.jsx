@@ -24,7 +24,8 @@ export default function HistoryArea({ onReviewQuiz }) {
             title: item.quiz_title,
             score: item.score,
             date: new Date(item.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }),
-            userAnswers: item.user_answers, // assumindo que adicionamos no banco dps ou ignoramos por enquanto
+            duration: item.duration,
+            userAnswers: item.user_answers,
             questions: item.questions
           }));
           setHistoryData(formatted);
@@ -62,6 +63,11 @@ export default function HistoryArea({ onReviewQuiz }) {
                       <h3 className="text-lg font-bold text-white">{item.title}</h3>
                       <div className="flex items-center gap-3 text-sm text-zinc-400 mt-1">
                         <span className="flex items-center gap-1"><Clock size={14} /> {item.date}</span>
+                        {item.duration > 0 && (
+                          <span className="flex items-center gap-1">
+                            • {Math.floor(item.duration / 60)}min {item.duration % 60}s
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

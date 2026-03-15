@@ -26,7 +26,7 @@ export default function AuthPage() {
         }
       });
       if (error) setMessage(`Erro: ${error.message}`);
-      else setMessage('Conta criada com sucesso! Faça o login para continuar.');
+      else setMessage('Conta criada com sucesso! Confirme seu cadastro no e-mail antes de fazer login pela primeira vez.');
     } else {
       // Faz o Login
       const { error } = await supabase.auth.signInWithPassword({ email, password });
